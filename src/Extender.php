@@ -28,7 +28,8 @@ class Extender implements PluginInterface, EventSubscriberInterface
      * @param Composer    $composer
      * @param IOInterface $io
      */
-    public function activate(Composer $composer, IOInterface $io) {
+    public function activate(Composer $composer, IOInterface $io)
+    {
         $this->composer = $composer;
         $this->io = $io;
     }
