@@ -8,6 +8,7 @@ use Composer\Plugin\PluginInterface;
 use Composer\Installer\PackageEvent;
 use Composer\Installer\PackageEvents;
 use Composer\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Yaml\Yaml;
 
 class Extender implements PluginInterface, EventSubscriberInterface
 {
@@ -47,5 +48,34 @@ class Extender implements PluginInterface, EventSubscriberInterface
      * @throws \Exception
      */
     public function postInstall(PackageEvent $event) {
+
+        $extenderManager = new ExtenderManager();
+        $directory = realpath(__DIR__.'/../../../../');
+        $configFile = $directory.'/console.config.yml';
+        $servicesFile = $directory.'/console.services.yml';
+
+        $extenderManager->addConfigFile($configFile);
+        $extenderManager->addServicesFile($servicesFile);
+        $extenderManager->processProjectPackages($directory);
+
+        if (is_dir($directory.'/vendor/bin/drupal')) {
+            $directory = $directory.'/vendor/bin/drupal';
+        }
+
+        $this->io->write('Creating cache file(s) at: ' . $directory);
+
+        if ($configData = $extenderManager->getConfigData()) {
+            file_put_contents(
+                $directory . '/extend.console.config.yml',
+                Yaml::dump($configData, 6, 2)
+            );
+        }
+
+        if ($servicesData = $extenderManager->getServicesData()) {
+            file_put_contents(
+                $directory . '/extend.console.services.yml',
+                Yaml::dump($servicesData, 4, 2)
+            );
+        }
     }
 }
