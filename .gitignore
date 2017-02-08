@@ -1,0 +1,19 @@
+# deprecation-detector
+/.rules
+
+# Composer
+/vendor
+
+# Binaries
+/box.phar
+/console.phar
+/composer.phar
+/drupal.phar
+/drupal.phar.version
+
+# Test
+/phpunit.xml
+
+# Project
+extend.config.yml
+extend.services.yml

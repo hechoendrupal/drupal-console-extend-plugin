@@ -1,0 +1,25 @@
+{
+    "name": "drupal/console-extend-plugin",
+    "description": "Drupal Console Extend Plugin",
+    "license": "GPL-2.0+",
+    "authors": [
+        {
+            "name": "Jesus Manuel Olivas",
+            "email": "jesus.olivas@gmail.com"
+        }
+    ],
+    "type": "composer-plugin",
+    "extra": {
+        "class": "Drupal\\Console\\Composer\\Plugin\\Extender"
+    },
+    "require": {
+        "composer/installers": "^1.2",
+        "symfony/yaml": ">=2.7 <3.0",
+        "symfony/finder": ">=2.7 <3.0"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {"Drupal\\Console\\Composer\\Plugin\\": "src"}
+    }
+}
