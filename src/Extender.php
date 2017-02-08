@@ -36,10 +36,12 @@ class Extender implements PluginInterface, EventSubscriberInterface
     /**
      * Returns an array of event names this subscriber wants to listen to.
      */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents()
+    {
         return array(
-            PackageEvents::POST_PACKAGE_INSTALL => "postInstall",
-            PackageEvents::POST_PACKAGE_UPDATE => "postInstall",
+            PackageEvents::POST_PACKAGE_INSTALL => "processPackages",
+            PackageEvents::POST_PACKAGE_UPDATE => "processPackages",
+            PackageEvents::POST_PACKAGE_UNINSTALL => "processPackages",
         );
     }
 
@@ -47,8 +49,8 @@ class Extender implements PluginInterface, EventSubscriberInterface
      * @param PackageEvent $event
      * @throws \Exception
      */
-    public function postInstall(PackageEvent $event) {
-
+    public function processPackages(PackageEvent $event)
+    {
         $extenderManager = new ExtenderManager();
         $directory = realpath(__DIR__.'/../../../../');
         $configFile = $directory.'/console.config.yml';
