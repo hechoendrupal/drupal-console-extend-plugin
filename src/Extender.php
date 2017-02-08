@@ -60,24 +60,28 @@ class Extender implements PluginInterface, EventSubscriberInterface
         $extenderManager->addServicesFile($servicesFile);
         $extenderManager->processProjectPackages($directory);
 
-        if (is_dir($directory.'/vendor/bin/drupal')) {
-            $directory = $directory.'/vendor/bin/drupal';
+        if (is_dir($directory.'/vendor/drupal/console')) {
+            $directory = $directory.'/vendor/drupal/console';
         }
 
-        $this->io->write('Creating cache file(s) at: ' . $directory);
+        $this->io->write('<info>Creating cache file(s) at: </info>' . $directory);
 
         if ($configData = $extenderManager->getConfigData()) {
+            $configFile = $directory . '/extend.console.config.yml';
             file_put_contents(
-                $directory . '/extend.console.config.yml',
+                $configFile,
                 Yaml::dump($configData, 6, 2)
             );
+            $this->io->write('<info>Cache file created at: </info>' . $configFile);
         }
 
         if ($servicesData = $extenderManager->getServicesData()) {
+            $servicesFile = $directory . '/extend.console.services.yml';
             file_put_contents(
-                $directory . '/extend.console.services.yml',
+                $servicesFile,
                 Yaml::dump($servicesData, 4, 2)
             );
+            $this->io->write('<info>Cache file created at: </info>' . $servicesFile);
         }
     }
 }
