@@ -6,6 +6,7 @@ use Composer\Composer;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
 use Composer\Installer\PackageEvent;
+use Composer\Installer\PackageEvents;
 use Composer\EventDispatcher\EventSubscriberInterface;
 
 class Extender implements PluginInterface, EventSubscriberInterface
@@ -14,6 +15,7 @@ class Extender implements PluginInterface, EventSubscriberInterface
      * @var Composer $composer
      */
     protected $composer;
+
     /**
      * @var IOInterface $io
      */
