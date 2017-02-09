@@ -54,35 +54,44 @@ class Extender implements PluginInterface, EventSubscriberInterface
     {
         $extenderManager = new ExtenderManager();
         $directory = realpath(__DIR__.'/../../../../');
-        $configFile = $directory.'/console.config.yml';
-        $servicesFile = $directory.'/console.services.yml';
-
-        $extenderManager->addConfigFile($configFile);
-        $extenderManager->addServicesFile($servicesFile);
         $extenderManager->processProjectPackages($directory);
 
         if (is_dir($directory.'/vendor/drupal/console')) {
             $directory = $directory.'/vendor/drupal/console';
+        } else {
+            $configFile = $directory.'/console.config.yml';
+            $servicesFile = $directory.'/console.services.yml';
+            $extenderManager->addConfigFile($configFile);
+            $extenderManager->addServicesFile($servicesFile);
         }
 
-        $this->io->write('<info>Creating cache file(s) at: </info>' . $directory);
+        $configFile = $directory . '/extend.console.config.yml';
+        $servicesFile = $directory . '/extend.console.services.yml';
+
+        if (file_exists($configFile)) {
+            unlink($configFile);
+            $this->io->write('<info>Removing config cache file:</info>' . $configFile);
+        }
+
+        if (file_exists($servicesFile)) {
+            unlink($servicesFile);
+            $this->io->write('<info>Removing services cache file:</info>' . $servicesFile);
+        }
 
         if ($configData = $extenderManager->getConfigData()) {
-            $configFile = $directory . '/extend.console.config.yml';
             file_put_contents(
                 $configFile,
                 Yaml::dump($configData, 6, 2)
             );
-            $this->io->write('<info>Cache file created at: </info>' . $configFile);
+            $this->io->write('<info>Creating config cache file:</info>' . $configFile);
         }
 
         if ($servicesData = $extenderManager->getServicesData()) {
-            $servicesFile = $directory . '/extend.console.services.yml';
             file_put_contents(
                 $servicesFile,
                 Yaml::dump($servicesData, 4, 2)
             );
-            $this->io->write('<info>Cache file created at: </info>' . $servicesFile);
+            $this->io->write('<info>Creating services cache file: </info>' . $servicesFile);
         }
     }
 }
