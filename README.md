@@ -4,5 +4,5 @@ Composer plugin to discover Drupal Console commands using a standard package/lib
 
 ### Install this project:
 ```
-composer require drupal/console-extend-plugin:dev-master 
+composer require drupal/console-extend-plugin
 ```
