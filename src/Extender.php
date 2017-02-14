@@ -67,6 +67,7 @@ class Extender implements PluginInterface, EventSubscriberInterface
 
         $configFile = $directory . '/extend.console.config.yml';
         $servicesFile = $directory . '/extend.console.services.yml';
+        $servicesUnistallFile = $directory . '/extend.console.uninstall.services.yml';
 
         if (file_exists($configFile)) {
             unlink($configFile);
@@ -78,6 +79,11 @@ class Extender implements PluginInterface, EventSubscriberInterface
             $this->io->write('<info>Removing services cache file:</info>' . $servicesFile);
         }
 
+        if (file_exists($servicesUnistallFile)) {
+            unlink($servicesUnistallFile);
+            $this->io->write('<info>Removing services cache file:</info>' . $servicesUnistallFile);
+        }
+
         if ($configData = $extenderManager->getConfigData()) {
             file_put_contents(
                 $configFile,
@@ -86,12 +92,22 @@ class Extender implements PluginInterface, EventSubscriberInterface
             $this->io->write('<info>Creating config cache file:</info>' . $configFile);
         }
 
-        if ($servicesData = $extenderManager->getServicesData()) {
+        $servicesData = $extenderManager->getServicesData();
+        if ($servicesData && array_key_exists('install', $servicesData)) {
             file_put_contents(
                 $servicesFile,
-                Yaml::dump($servicesData, 4, 2)
+                Yaml::dump($servicesData['install'], 4, 2)
             );
             $this->io->write('<info>Creating services cache file: </info>' . $servicesFile);
+        }
+
+        $servicesData = $extenderManager->getServicesData();
+        if ($servicesData && array_key_exists('uninstall', $servicesData)) {
+            file_put_contents(
+                $servicesUnistallFile,
+                Yaml::dump($servicesData['uninstall'], 4, 2)
+            );
+            $this->io->write('<info>Creating services cache file: </info>' . $servicesUnistallFile);
         }
     }
 }
