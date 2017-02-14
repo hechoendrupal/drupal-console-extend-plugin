@@ -70,10 +70,13 @@ class ExtenderManager
         $servicesData = $this->parseData($servicesFile);
         if ($this->isValidServicesData($servicesData)) {
             foreach ($servicesData['services'] as $key => $definition) {
+
                 if (!array_key_exists('tags', $definition)) {
                     continue;
                 }
+
                 $bootstrap = 'install';
+
                 foreach ($definition['tags'] as $tags) {
                     if (!array_key_exists('name', $tags)) {
                         continue;
@@ -84,12 +87,7 @@ class ExtenderManager
                     }
                 }
 
-                $packageService[$bootstrap]['services'][$key] = $definition;
-
-                $this->servicesData = array_merge_recursive(
-                    $packageService,
-                    $this->servicesData
-                );
+                $this->servicesData[$bootstrap]['services'][$key] = $definition;
             }
         }
     }
