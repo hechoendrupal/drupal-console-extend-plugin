@@ -70,24 +70,26 @@ class ExtenderManager
         $servicesData = $this->parseData($servicesFile);
         if ($this->isValidServicesData($servicesData)) {
             foreach ($servicesData['services'] as $key => $definition) {
-
                 if (!array_key_exists('tags', $definition)) {
                     continue;
                 }
-
                 $bootstrap = 'install';
-
                 foreach ($definition['tags'] as $tags) {
                     if (!array_key_exists('name', $tags)) {
+                        $bootstrap = null;
                         continue;
                     }
-
+                    if ($tags['name'] != 'drupal.command') {
+                        $bootstrap = null;
+                        continue;
+                    }
                     if (array_key_exists('bootstrap', $tags)) {
                         $bootstrap = $tags['bootstrap'];
                     }
                 }
-
-                $this->servicesData[$bootstrap]['services'][$key] = $definition;
+                if ($bootstrap) {
+                    $this->servicesData[$bootstrap]['services'][$key] = $definition;
+                }
             }
         }
     }
