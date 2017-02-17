@@ -64,21 +64,21 @@ class Extender implements PluginInterface, EventSubscriberInterface
         $repositoryManager = $composer->getRepositoryManager();
         $localRepository = $repositoryManager->getLocalRepository();
 
-        foreach($localRepository->getPackages() as $package) {
-          if($installationManager->isPackageInstalled($localRepository, $package)) {
-            if($package->getType() === 'drupal-console-library') {
+        foreach ($localRepository->getPackages() as $package) {
+          if ($installationManager->isPackageInstalled($localRepository, $package)) {
+            if ($package->getType() === 'drupal-console-library') {
               $extenderManager->addConfigFile($installationManager->getInstallPath($package) . '/console.services.yml');
               $extenderManager->addConfigFile($installationManager->getInstallPath($package) . '/console.config.yml');
             }
           }
         }
 
-        if($consolePackage = $localRepository->findPackage('drupal/console', '*')) {
-          if($localRepository->hasPackage($consolePackage)) {
+        if ($consolePackage = $localRepository->findPackage('drupal/console', '*')) {
+          if ($localRepository->hasPackage($consolePackage)) {
             $directory = $installationManager->getInstallPath($consolePackage);
           }
         }
-        if(empty($directory)) {
+        if (empty($directory)) {
           // cwd should be the project root.  This is the same logic Symfony uses.
           $directory = getcwd();
         }
