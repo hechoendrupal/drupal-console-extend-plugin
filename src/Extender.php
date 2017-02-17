@@ -53,16 +53,29 @@ class Extender implements PluginInterface, EventSubscriberInterface
     public function processPackages(PackageEvent $event)
     {
         $extenderManager = new ExtenderManager();
-        $directory = realpath(__DIR__.'/../../../../');
-        $extenderManager->processProjectPackages($directory);
 
-        if (is_dir($directory.'/vendor/drupal/console')) {
-            $directory = $directory.'/vendor/drupal/console';
-        } else {
-            $configFile = $directory.'/console.config.yml';
-            $servicesFile = $directory.'/console.services.yml';
-            $extenderManager->addConfigFile($configFile);
-            $extenderManager->addServicesFile($servicesFile);
+        $composer = $event->getComposer();
+        $installationManager = $composer->getInstallationManager();
+        $repositoryManager = $composer->getRepositoryManager();
+        $localRepository = $repositoryManager->getLocalRepository();
+
+        foreach($localRepository->getPackages() as $package) {
+          if($installationManager->isPackageInstalled($localRepository, $package)) {
+            if($package->getType() === 'drupal-console-library') {
+              $extenderManager->addConfigFile($installationManager->getInstallPath($package) . '/console.services.yml');
+              $extenderManager->addConfigFile($installationManager->getInstallPath($package) . '/console.config.yml');
+            }
+          }
+        }
+
+        if($consolePackage = $localRepository->findPackage('drupal/console', '*')) {
+          if($localRepository->hasPackage($consolePackage)) {
+            $directory = $installationManager->getInstallPath($consolePackage);
+          }
+        }
+        if(empty($outputPath)) {
+          // cwd should be the project root.  This is the same logic Symfony uses.
+          $directory = getcwd();
         }
 
         $configFile = $directory . '/extend.console.config.yml';
