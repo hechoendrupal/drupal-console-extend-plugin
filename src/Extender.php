@@ -10,6 +10,11 @@ use Composer\Installer\PackageEvents;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Yaml\Yaml;
 
+// Explicitly require ExtenderManager here.
+// When this package is uninstalled, ExtenderManager needs to be available any
+// time this class is available.
+require_once 'ExtenderManager.php';
+
 class Extender implements PluginInterface, EventSubscriberInterface
 {
     /**
@@ -52,9 +57,6 @@ class Extender implements PluginInterface, EventSubscriberInterface
      */
     public function processPackages(PackageEvent $event)
     {
-        // Explicit require, because during uninstallation, this class can't be
-        // autoloaded.
-        require_once './ExtenderManager.php';
         $extenderManager = new ExtenderManager();
 
         $composer = $event->getComposer();
