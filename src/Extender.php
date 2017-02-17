@@ -67,7 +67,7 @@ class Extender implements PluginInterface, EventSubscriberInterface
         foreach ($localRepository->getPackages() as $package) {
           if ($installationManager->isPackageInstalled($localRepository, $package)) {
             if ($package->getType() === 'drupal-console-library') {
-              $extenderManager->addConfigFile($installationManager->getInstallPath($package) . '/console.services.yml');
+              $extenderManager->addServicesFile($installationManager->getInstallPath($package) . '/console.services.yml');
               $extenderManager->addConfigFile($installationManager->getInstallPath($package) . '/console.config.yml');
             }
           }
