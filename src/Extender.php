@@ -52,6 +52,9 @@ class Extender implements PluginInterface, EventSubscriberInterface
      */
     public function processPackages(PackageEvent $event)
     {
+        // Explicit require, because during uninstallation, this class can't be
+        // autoloaded.
+        require_once './ExtenderManager.php';
         $extenderManager = new ExtenderManager();
 
         $composer = $event->getComposer();
