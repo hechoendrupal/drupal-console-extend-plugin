@@ -78,7 +78,7 @@ class Extender implements PluginInterface, EventSubscriberInterface
             $directory = $installationManager->getInstallPath($consolePackage);
           }
         }
-        if(empty($outputPath)) {
+        if(empty($directory)) {
           // cwd should be the project root.  This is the same logic Symfony uses.
           $directory = getcwd();
         }
