@@ -52,62 +52,69 @@ class Extender implements PluginInterface, EventSubscriberInterface
      */
     public function processPackages(PackageEvent $event)
     {
-        $extenderManager = new ExtenderManager();
-        $directory = realpath(__DIR__.'/../../../../');
-        $extenderManager->processProjectPackages($directory);
+      $package = $event->getOperation()->getPackage();
+      $installationManager = $event->getComposer()->getInstallationManager();
+      $projectDirectory = $installationManager->getInstallPath($package);
 
-        if (is_dir($directory.'/vendor/drupal/console')) {
-            $directory = $directory.'/vendor/drupal/console';
-        } else {
-            $configFile = $directory.'/console.config.yml';
-            $servicesFile = $directory.'/console.services.yml';
+        if (is_dir($projectDirectory)) {
+          $extenderManager = new ExtenderManager();
+          $directory = realpath(__DIR__.'/../../../../');
+          $extenderManager->processProjectPackages($projectDirectory);
+
+          if (is_dir($directory . '/vendor/drupal/console')) {
+            $directory = $directory . '/vendor/drupal/console';
+          }
+          else {
+            $configFile = $directory . '/console.config.yml';
+            $servicesFile = $directory . '/console.services.yml';
             $extenderManager->addConfigFile($configFile);
             $extenderManager->addServicesFile($servicesFile);
-        }
+          }
 
-        $configFile = $directory . '/extend.console.config.yml';
-        $servicesFile = $directory . '/extend.console.services.yml';
-        $servicesUninstallFile = $directory . '/extend.console.uninstall.services.yml';
+          $configFile = $directory . '/extend.console.config.yml';
+          $servicesFile = $directory . '/extend.console.services.yml';
+          $servicesUninstallFile = $directory . '/extend.console.uninstall.services.yml';
 
-        if (file_exists($configFile)) {
+          if (file_exists($configFile)) {
             unlink($configFile);
             $this->io->write('<info>Removing config cache file:</info>' . $configFile);
-        }
+          }
 
-        if (file_exists($servicesFile)) {
+          if (file_exists($servicesFile)) {
             unlink($servicesFile);
             $this->io->write('<info>Removing services cache file:</info>' . $servicesFile);
-        }
+          }
 
-        if (file_exists($servicesUninstallFile)) {
+          if (file_exists($servicesUninstallFile)) {
             unlink($servicesUninstallFile);
             $this->io->write('<info>Removing services cache file:</info>' . $servicesUninstallFile);
-        }
+          }
 
-        if ($configData = $extenderManager->getConfigData()) {
+          if ($configData = $extenderManager->getConfigData()) {
             file_put_contents(
-                $configFile,
-                Yaml::dump($configData, 6, 2)
+              $configFile,
+              Yaml::dump($configData, 6, 2)
             );
             $this->io->write('<info>Creating config cache file:</info>' . $configFile);
-        }
+          }
 
-        $servicesData = $extenderManager->getServicesData();
-        if ($servicesData && array_key_exists('install', $servicesData)) {
+          $servicesData = $extenderManager->getServicesData();
+          if ($servicesData && array_key_exists('install', $servicesData)) {
             file_put_contents(
-                $servicesFile,
-                Yaml::dump($servicesData['install'], 4, 2)
+              $servicesFile,
+              Yaml::dump($servicesData['install'], 4, 2)
             );
             $this->io->write('<info>Creating services cache file: </info>' . $servicesFile);
-        }
+          }
 
-        $servicesData = $extenderManager->getServicesData();
-        if ($servicesData && array_key_exists('uninstall', $servicesData)) {
+          $servicesData = $extenderManager->getServicesData();
+          if ($servicesData && array_key_exists('uninstall', $servicesData)) {
             file_put_contents(
-                $servicesUninstallFile,
-                Yaml::dump($servicesData['uninstall'], 4, 2)
+              $servicesUninstallFile,
+              Yaml::dump($servicesData['uninstall'], 4, 2)
             );
             $this->io->write('<info>Creating services cache file: </info>' . $servicesUninstallFile);
+          }
         }
     }
 }
