@@ -130,7 +130,8 @@ class ExtenderManager
         $finder->files()
             ->name('composer.json')
             ->contains('drupal-console-library')
-            ->in($directory);
+            ->in($directory)
+            ->ignoreUnreadableDirs();
 
         foreach ($finder as $file) {
             $this->processComposerFile($file->getPathName());
