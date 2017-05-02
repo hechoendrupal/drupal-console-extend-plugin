@@ -13,7 +13,7 @@ use Symfony\Component\Yaml\Yaml;
 // Explicitly require ExtenderManager here.
 // When this package is uninstalled, ExtenderManager needs to be available any
 // time this class is available.
-require_once 'ExtenderManager.php';
+require_once __DIR__ . '/ExtenderManager.php';
 
 class Extender implements PluginInterface, EventSubscriberInterface
 {
