@@ -5,10 +5,11 @@ namespace Drupal\Console\Composer\Plugin;
 use Composer\Composer;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
-use Composer\Installer\PackageEvent;
-use Composer\Installer\PackageEvents;
+use Composer\Script\Event;
+use Composer\Script\ScriptEvents;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Finder\Finder;
 
 // Explicitly require ExtenderManager here.
 // When this package is uninstalled, ExtenderManager needs to be available any
@@ -44,18 +45,17 @@ class Extender implements PluginInterface, EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            PackageEvents::POST_PACKAGE_INSTALL => "processPackages",
-            PackageEvents::POST_PACKAGE_UPDATE => "processPackages",
-            PackageEvents::POST_PACKAGE_UNINSTALL => "processPackages",
-        );
+        return [
+            ScriptEvents::POST_INSTALL_CMD => "processPackages",
+            ScriptEvents::POST_UPDATE_CMD => "processPackages",
+        ];
     }
 
     /**
-     * @param PackageEvent $event
+     * @param Event $event
      * @throws \Exception
      */
-    public function processPackages(PackageEvent $event)
+    public function processPackages(Event $event)
     {
         $extenderManager = new ExtenderManager();
 
@@ -65,22 +65,22 @@ class Extender implements PluginInterface, EventSubscriberInterface
         $localRepository = $repositoryManager->getLocalRepository();
 
         foreach ($localRepository->getPackages() as $package) {
-          if ($installationManager->isPackageInstalled($localRepository, $package)) {
-            if ($package->getType() === 'drupal-console-library') {
-              $extenderManager->addServicesFile($installationManager->getInstallPath($package) . '/console.services.yml');
-              $extenderManager->addConfigFile($installationManager->getInstallPath($package) . '/console.config.yml');
+            if ($installationManager->isPackageInstalled($localRepository, $package)) {
+                if ($package->getType() === 'drupal-console-library') {
+                    $extenderManager->addServicesFile($installationManager->getInstallPath($package) . '/console.services.yml');
+                    $extenderManager->addConfigFile($installationManager->getInstallPath($package) . '/console.config.yml');
+                }
             }
-          }
         }
 
         if ($consolePackage = $localRepository->findPackage('drupal/console', '*')) {
-          if ($localRepository->hasPackage($consolePackage)) {
-            $directory = $installationManager->getInstallPath($consolePackage);
-          }
+            if ($localRepository->hasPackage($consolePackage)) {
+                $directory = $installationManager->getInstallPath($consolePackage);
+            }
         }
         if (empty($directory)) {
-          // cwd should be the project root.  This is the same logic Symfony uses.
-          $directory = getcwd();
+            // cwd should be the project root.  This is the same logic Symfony uses.
+            $directory = getcwd();
         }
 
         $configFile = $directory . '/extend.console.config.yml';
@@ -126,6 +126,28 @@ class Extender implements PluginInterface, EventSubscriberInterface
                 Yaml::dump($servicesData['uninstall'], 4, 2)
             );
             $this->io->write('<info>Creating services cache file: </info>' . $servicesUninstallFile);
+        }
+
+        $this->removeCacheFiles();
+    }
+
+    protected function removeCacheFiles()
+    {
+        $finder = new Finder();
+        $finder->files()
+            ->in(getcwd().'/console/cache/')
+            ->ignoreUnreadableDirs();
+
+        foreach ($finder as $file) {
+            unlink($file->getPathName());
+        }
+
+        $finder->directories()
+            ->in(getcwd().'/console/cache/')
+            ->ignoreUnreadableDirs();
+
+        foreach ($finder as $directory) {
+            rmdir($directory);
         }
     }
 }
