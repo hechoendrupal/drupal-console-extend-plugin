@@ -133,26 +133,28 @@ class Extender implements PluginInterface, EventSubscriberInterface
 
     protected function removeCacheFiles()
     {
-      try {
-        $finder = new Finder();
-        $finder->files()
-          ->in(getcwd().'/console/cache/')
-          ->ignoreUnreadableDirs();
+        if (is_dir(getcwd().'/console/cache/')) {
+            try {
+                $finder = new Finder();
+                $finder->files()
+                    ->in(getcwd() . '/console/cache/')
+                    ->ignoreUnreadableDirs();
 
-        foreach ($finder as $file) {
-          unlink($file->getPathName());
+                foreach ($finder as $file) {
+                    unlink($file->getPathName());
+                }
+
+                $finder->directories()
+                    ->in(getcwd() . '/console/cache/')
+                    ->ignoreUnreadableDirs();
+
+                foreach ($finder as $directory) {
+                    rmdir($directory);
+                }
+
+            } catch (\InvalidArgumentException $argumentException) {
+                $this->io->write('<info>Cache files can not be deleted</info>');
+            }
         }
-
-        $finder->directories()
-          ->in(getcwd().'/console/cache/')
-          ->ignoreUnreadableDirs();
-
-        foreach ($finder as $directory) {
-          rmdir($directory);
-        }
-      }
-      catch (\InvalidArgumentException $argumentException) {
-        // Do nothing if we don't have cache dir.
-      }
     }
 }
