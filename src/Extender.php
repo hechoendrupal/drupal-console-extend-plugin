@@ -133,21 +133,26 @@ class Extender implements PluginInterface, EventSubscriberInterface
 
     protected function removeCacheFiles()
     {
+      try {
         $finder = new Finder();
         $finder->files()
-            ->in(getcwd().'/console/cache/')
-            ->ignoreUnreadableDirs();
+          ->in(getcwd().'/console/cache/')
+          ->ignoreUnreadableDirs();
 
         foreach ($finder as $file) {
-            unlink($file->getPathName());
+          unlink($file->getPathName());
         }
 
         $finder->directories()
-            ->in(getcwd().'/console/cache/')
-            ->ignoreUnreadableDirs();
+          ->in(getcwd().'/console/cache/')
+          ->ignoreUnreadableDirs();
 
         foreach ($finder as $directory) {
-            rmdir($directory);
+          rmdir($directory);
         }
+      }
+      catch (\InvalidArgumentException $argumentException) {
+        // Do nothing if we don't have cache dir.
+      }
     }
 }
