@@ -67,6 +67,10 @@ class ExtenderManager
      */
     public function addServicesFile($servicesFile)
     {
+        $consoleTags = [
+            'drupal.command',
+            'drupal.generator'
+        ];
         $servicesData = $this->parseData($servicesFile);
         if ($this->isValidServicesData($servicesData)) {
             foreach ($servicesData['services'] as $key => $definition) {
@@ -79,7 +83,7 @@ class ExtenderManager
                         $bootstrap = null;
                         continue;
                     }
-                    if ($tags['name'] != 'drupal.command') {
+                    if (array_search($tags['name'], $consoleTags) === false) {
                         $bootstrap = null;
                         continue;
                     }
