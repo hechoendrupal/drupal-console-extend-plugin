@@ -89,17 +89,20 @@ class Extender implements PluginInterface, EventSubscriberInterface
 
         if (file_exists($configFile)) {
             unlink($configFile);
-            $this->io->write('<info>Removing config cache file:</info>' . $configFile);
+            $this->io->write('<info>Removing config cache file:</info>');
+            $this->io->write($configFile);
         }
 
         if (file_exists($servicesFile)) {
             unlink($servicesFile);
-            $this->io->write('<info>Removing services cache file:</info>' . $servicesFile);
+            $this->io->write('<info>Removing packages services cache file:</info>');
+            $this->io->write($servicesFile);
         }
 
         if (file_exists($servicesUninstallFile)) {
             unlink($servicesUninstallFile);
-            $this->io->write('<info>Removing services cache file:</info>' . $servicesUninstallFile);
+            $this->io->write('<info>Removing packages services cache file:</info>');
+            $this->io->write($servicesUninstallFile);
         }
 
         if ($configData = $extenderManager->getConfigData()) {
@@ -107,7 +110,8 @@ class Extender implements PluginInterface, EventSubscriberInterface
                 $configFile,
                 Yaml::dump($configData, 6, 2)
             );
-            $this->io->write('<info>Creating config cache file:</info>' . $configFile);
+            $this->io->write('<info>Creating packages config cache file:</info>');
+            $this->io->write($configFile);
         }
 
         $servicesData = $extenderManager->getServicesData();
@@ -116,7 +120,8 @@ class Extender implements PluginInterface, EventSubscriberInterface
                 $servicesFile,
                 Yaml::dump($servicesData['install'], 4, 2)
             );
-            $this->io->write('<info>Creating services cache file: </info>' . $servicesFile);
+            $this->io->write('<info>Creating packages services cache file: </info>');
+            $this->io->write($servicesFile);
         }
 
         $servicesData = $extenderManager->getServicesData();
@@ -125,36 +130,29 @@ class Extender implements PluginInterface, EventSubscriberInterface
                 $servicesUninstallFile,
                 Yaml::dump($servicesData['uninstall'], 4, 2)
             );
-            $this->io->write('<info>Creating services cache file: </info>' . $servicesUninstallFile);
+            $this->io->write('<info>Creating packages services cache file: </info>');
+            $this->io->write($servicesUninstallFile);
         }
 
-        $this->removeCacheFiles();
+        $this->removeCacheFiles($directory);
     }
 
-    protected function removeCacheFiles()
+    protected function removeCacheFiles($directory)
     {
-        if (is_dir(getcwd().'/console/cache/')) {
-            try {
-                $finder = new Finder();
-                $finder->files()
-                    ->in(getcwd() . '/console/cache/')
-                    ->ignoreUnreadableDirs();
+        try {
+            $finder = new Finder();
+            $finder->files()
+                ->in($directory)
+                ->name('*-console.services.yml')
+                ->ignoreUnreadableDirs();
 
-                foreach ($finder as $file) {
-                    unlink($file->getPathName());
-                }
-
-                $finder->directories()
-                    ->in(getcwd() . '/console/cache/')
-                    ->ignoreUnreadableDirs();
-
-                foreach ($finder as $directory) {
-                    rmdir($directory);
-                }
-
-            } catch (\InvalidArgumentException $argumentException) {
-                $this->io->write('<info>Cache files can not be deleted</info>');
+            foreach ($finder as $file) {
+                $this->io->write('<info>Removing site services cache file:</info>');
+                $this->io->write($file->getPathName());
+                unlink($file->getPathName());
             }
+        } catch (\InvalidArgumentException $argumentException) {
+            $this->io->write('<info>Cache file can not be deleted</info>');
         }
     }
 }
