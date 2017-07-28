@@ -14,8 +14,8 @@
     },
     "require": {
         "composer-plugin-api": "^1.0",
-        "symfony/yaml": ">=2.7 <3.0",
-        "symfony/finder": ">=2.7 <3.0"
+        "symfony/yaml": "~2.7|~3.0",
+        "symfony/finder": "~2.7|~3.0"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
