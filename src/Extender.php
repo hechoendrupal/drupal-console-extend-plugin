@@ -73,11 +73,14 @@ class Extender implements PluginInterface, EventSubscriberInterface
             }
         }
 
+        /*
         if ($consolePackage = $localRepository->findPackage('drupal/console', '*')) {
             if ($localRepository->hasPackage($consolePackage)) {
                 $directory = $installationManager->getInstallPath($consolePackage);
             }
         }
+        */
+
         if (empty($directory)) {
             // cwd should be the project root.  This is the same logic Symfony uses.
             $directory = getcwd();
