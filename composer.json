@@ -13,7 +13,7 @@
         "class": "Drupal\\Console\\Composer\\Plugin\\Extender"
     },
     "require": {
-        "composer-plugin-api": "^1.0",
+        "composer-plugin-api": "^1.0|^2.0",
         "composer/installers": "^1.2",
         "symfony/yaml": "~3.0|^4.4",
         "symfony/finder": "~3.0|^4.4"
